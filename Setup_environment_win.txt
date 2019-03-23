@@ -23,3 +23,11 @@
     要把这些dll文件复制到 c:\windows\system32目录，以便后面我们自己写的一些执行文件，需要调用这里面的函数。
     还有 build_opencv\3rdparty\ffmpeg 有两个dll，也一并复制过去。
    
+13. 编译samples， 建立一个build_opencv_samples目录。
+14. cmake 重新选源文件目录 opencv-4.0.0/sources/samples，二进制文件目录 build_opencv_samples。
+15. 点击configure，会出错，打开cmake中间那里 name--value ，找到 OPENCV_DIR 和 OPENCV_CONFIG_PATH，将这两项的值，设置为 build_opencv 目录。
+16. 设置好 OPENCV_DIR 和 OPENCV_CONFIG_PATH 后， 再次点击 configure。应该会成功。
+17. 此时，再点generate。 就会在 build_opencv_samples 生成工程配置文件了。
+18. 双击 build_opencv_samples/samples.sln， 在visual studio 2017中，就打开了samples的工程，然后“生成”->“生成解决方案”。
+19. 等所有的编译完成， build_opencv4_samples\cpp\Debug 目录下，就是一些 cpp的例子了。其他目录的 Debug下，也有它们对应的 exe。
+20. 此时，所有编译完成。 可以去运行例子和学习samples了。
