@@ -1,0 +1,21 @@
+1. 编译环境 Visual studio 2017 
+网址  https://visualstudio.microsoft.com/zh-hans/downloads/
+选 社区版，下载好后，安装。
+
+2. Opencv版本： 4.0.0 
+网址 https://opencv.org/releases.html
+选 4.0.0 的Win pack
+下载好后，解压出来。
+
+3. 下载安装cmake。
+网址 https://cmake.org/download/
+选windows的zip版本，解压出来就好了。
+
+4. 建好一个build_opencv目录。
+5. 运行 cmake-3.14.0-win64-x64\bin\cmake-gui.exe。
+6. cmake界面上，源文件目录选 opencv-4.0.0/sources/， 二进制目录（编译目录）选 第四步那个 build_opencv 目录。
+7. cmake界面， 点击 configure，会弹出选编译环境， 选 vc15 即 visual studio 2017。 机器是x64（根据自己电脑来定）。
+8. 第一次configure完成后，再点第二次configure。
+9. 两次configure都正常完成，没有错误。 就点generate，去生成工程配置文件。
+10. 顺利生成完毕。双击 build_opencv/OpenCV.sln， 打开此工程，进入到visual studio 2017的界面。
+   
