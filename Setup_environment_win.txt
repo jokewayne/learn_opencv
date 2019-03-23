@@ -18,4 +18,8 @@
 8. 第一次configure完成后，再点第二次configure。
 9. 两次configure都正常完成，没有错误。 就点generate，去生成工程配置文件。
 10. 顺利生成完毕。双击 build_opencv/OpenCV.sln， 打开此工程，进入到visual studio 2017的界面。
+11. 然后在visual studio 2017菜单，选“生成”->“生成解决方案”。至此，顺利的话，就编译完opencv了。
+12. 编译生成的有用文件在 build_opencv\bin\Debug目录， 主要是 opencv_*.dll 
+    要把这些dll文件复制到 c:\windows\system32目录，以便后面我们自己写的一些执行文件，需要调用这里面的函数。
+    还有 build_opencv\3rdparty\ffmpeg 有两个dll，也一并复制过去。
    
