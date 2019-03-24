@@ -2,3 +2,4 @@ human vision system are based on continues vision input。 and also base on gene
 
 Each time only process different between new vision input and old one which only few milliseconds ago。
 
+Also human recognize things most base on lines and shape，seems not base on color texture。
