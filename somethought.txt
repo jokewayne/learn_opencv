@@ -1,1 +1,4 @@
-#
+human vision system are based on continues vision input。 and also base on general knowledge or deep learning。
+
+Each time only process different between new vision input and old one which only few milliseconds ago。
+
