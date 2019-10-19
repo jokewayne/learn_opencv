@@ -1,0 +1,17 @@
+doc from opencv is 
+https://docs.opencv.org/3.4.7/
+
+https://docs.opencv.org/3.4.7/d7/d9f/tutorial_linux_install.html
+
+1. download from git
+https://github.com/opencv/opencv/archive/3.4.7.zip
+
+2. unzip and make build directory.
+unzip 3.4.7.zip
+cd open-3.4.7
+mkdir build
+cd build
+
+3. configure and make
+cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local ..
+make -j4
