@@ -15,3 +15,6 @@ cd build
 3. configure and make
 cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local ..
 make -j4
+
+4. install
+sudo make install
