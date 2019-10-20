@@ -14,6 +14,10 @@ cd build
 
 3. configure and make
 cmake -D CMAKE_BUILD_TYPE=Release -D CMAKE_INSTALL_PREFIX=/usr/local ..
+# this will download ippicv
+# you can copy your own to opencv_basedir/.cache/ippicv/
+# cp ~/opencv/ippicv_2019_lnx_intel64_general_20180723.tgz c0bd78adb4156bbf552c1dfe90599607-ippicv_2019_lnx_intel64_general_20180723.tgz
+# where go download, you can use grep -nR "ippicv_2019_lnx_intel64_general_20180723.tgz" to find.
 make -j4
 
 4. install
