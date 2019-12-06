@@ -26,3 +26,5 @@ sudo make install
 5. compile your own program
 *.hpp files can be found in /usr/local/include/opencv/ or /usr/local/include/opencv2/
 *.so files are in /usr/local/lib/
+compile command will be:
+g++ sample.cpp -o sample -lopencv_imgcodecs -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_videoio
