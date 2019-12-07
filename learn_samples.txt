@@ -7,5 +7,14 @@
 4. 算法原理。
 5. 识别、深度学习的原理及框架。
 
-
+-------------------------------------------------
+erode
+dilate
+blur
+median blur
+guassian blur
+sobel
+canny
+thresh hold
+convert to gray
 
