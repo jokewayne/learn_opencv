@@ -3,11 +3,14 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>  // cv::Canny()
 #include <iostream>
+#include "mylib.hpp"
 
 using namespace cv;
 using std::cout; using std::cerr; using std::endl;
 /* modified by me */
-const String window_name = "MyCamera";
+const String capture_name = "MyCamera";
+const String window_name = "MyConfig";
+const String info_name = "info";
 const String ptype_name = "Process Type";
 const String p1_name = "P1";
 const String p2_name = "P2";
@@ -15,13 +18,13 @@ const String p3_name = "P3";
 const String p4_name = "P4";
 int ptype = 0;
 int p1 = 0;
-int p2 = 0;
+int p2 = -1;
 int p3 = 0;
 int p4 = 0;
 int psize=0;
 double thresh = 100;
 int maxVal = 255;
-Mat frame,  processed;
+Mat frame,  processed, infoimg, configimg;
 
 static void on_ptype_trackbar(int, void *)
 {
@@ -67,6 +70,23 @@ static void do_process()
 			cv::cvtColor(frame, processed, CV_BGR2GRAY);
 			cv::threshold(processed, processed, (double)p4, maxVal, cv::THRESH_BINARY);
 			break;
+		case 6:
+			cv::flip(frame, processed, p2);
+			break;
+		case 7:
+			processed = channel_swap(frame);
+			break;
+		case 8:
+			processed = BGR2GRAY(frame);
+			infoimg = histinfo(processed);
+			break;
+		case 9:
+			processed = BGR2GRAY(frame);
+			processed = grayInvert(processed);
+			break;
+		case 10:
+			processed = frame;
+			infoimg = histinfo(processed);
 		default:
 			processed=frame;
 			break;
@@ -82,7 +102,12 @@ int main(int, char**)
         cerr << "ERROR: Can't initialize camera capture" << endl;
         return 1;
     }
+    namedWindow(capture_name);
     namedWindow(window_name);
+    namedWindow(info_name);
+
+    configimg = cv::Mat::zeros(100, 400, CV_8UC1);
+    infoimg = cv::Mat::zeros(300, 300, CV_8UC1);
     cout << "Frame width: " << capture.get(CAP_PROP_FRAME_WIDTH) << endl;
     cout << "     height: " << capture.get(CAP_PROP_FRAME_HEIGHT) << endl;
     cout << "Capturing FPS: " << capture.get(CAP_PROP_FPS) << endl;
@@ -95,7 +120,7 @@ int main(int, char**)
     int64 t0 = cv::getTickCount();
     int64 processingTime = 0;
 
-    createTrackbar(ptype_name, window_name, &ptype, 10, on_ptype_trackbar);
+    createTrackbar(ptype_name, window_name, &ptype, 20, on_ptype_trackbar);
     createTrackbar(p1_name, window_name, &p1, 10, on_p1_trackbar);
     createTrackbar(p2_name, window_name, &p2, 10, on_p2_trackbar);
     createTrackbar(p3_name, window_name, &p3, 10, on_p3_trackbar);
@@ -117,6 +142,9 @@ int main(int, char**)
             int64 t1 = cv::getTickCount();
             cout << "ptype:" << ptype
 		 << "-p1:" << p1 
+		 << "-p2:" << p2 
+		 << "-p3:" << p3 
+		 << "-p4:" << p4 
 		 << "TotalFrames:" << cv::format("%5lld", (long long int)nFrames)
                  << "-Average FPS: " << cv::format("%9.1f", (double)getTickFrequency() * N / (t1 - t0))
                  << "-Average time per frame: " << cv::format("%9.2f ms", (double)(t1 - t0) * 1000.0f / (N * getTickFrequency()))
@@ -127,16 +155,22 @@ int main(int, char**)
         }
         if (!enableProcessing)
         {
-            imshow(window_name, frame);
-        }
+            imshow(capture_name, frame);
+            imshow(window_name, configimg);
+    	    moveWindow(window_name, 0, 0 ); 
+	}
         else
         {
             int64 tp0 = cv::getTickCount();
             //cv::Canny(frame, processed, 400, 1000, 5);
 	    do_process();
             processingTime += cv::getTickCount() - tp0;
-            imshow(window_name, processed);
+            imshow(capture_name, processed);
+	    imshow(window_name, configimg);
+	    imshow(info_name, infoimg);
         }
+        moveWindow(info_name, 1366 - infoimg.cols, 0);
+	moveWindow(window_name, 0, 0 ); 
         int key = waitKey(1);
         if (key == 27/*ESC*/)
             break;
