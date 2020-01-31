@@ -87,6 +87,10 @@ static void do_process()
 		case 10:
 			processed = frame;
 			infoimg = histinfo(processed);
+			break;
+		case 11:
+			processed = myrotate(frame, p1*36.0, 1);
+			break;
 		default:
 			processed=frame;
 			break;
