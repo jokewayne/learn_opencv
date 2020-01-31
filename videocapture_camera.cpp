@@ -1,185 +1,343 @@
 #include <opencv2/core.hpp>
-#include <opencv2/videoio.hpp>
-#include <opencv2/highgui.hpp>
-#include <opencv2/imgproc.hpp>  // cv::Canny()
 #include <iostream>
-#include "mylib.hpp"
+#include <cmath>
 
-using namespace cv;
 using std::cout; using std::cerr; using std::endl;
-/* modified by me */
-const String capture_name = "MyCamera";
-const String window_name = "MyConfig";
-const String info_name = "info";
-const String ptype_name = "Process Type";
-const String p1_name = "P1";
-const String p2_name = "P2";
-const String p3_name = "P3";
-const String p4_name = "P4";
-int ptype = 0;
-int p1 = 0;
-int p2 = -1;
-int p3 = 0;
-int p4 = 0;
-int psize=0;
-double thresh = 100;
-int maxVal = 255;
-Mat frame,  processed, infoimg, configimg;
 
-static void on_ptype_trackbar(int, void *)
-{
-   setTrackbarPos(ptype_name, window_name, ptype); 
+cv::Mat getMat(cv::Mat img, cv::Size sz) { 
+	int channels;
+	if ( 1 == img.channels()) {
+		return cv::Mat::zeros(sz.width, sz.height, CV_8UC1);
+	} else if ( 3 == img.channels()) {
+		return cv::Mat::zeros(sz.width, sz.height, CV_8UC3);
+	} 
+	return cv::Mat::zeros(sz.width, sz.height, CV_8UC3);
 }
-static void on_p1_trackbar(int, void *)
-{
-   setTrackbarPos(p1_name, window_name, p1); 
-}
-static void on_p2_trackbar(int, void *)
-{
-   setTrackbarPos(p2_name, window_name, p2); 
-}
-static void on_p3_trackbar(int, void *)
-{
-   setTrackbarPos(p3_name, window_name, p3); 
-}
-static void on_p4_trackbar(int, void *)
-{
-   setTrackbarPos(p4_name, window_name, p4); 
-}
-static void do_process() 
-{
-	psize = p1 * 2 + 1;
-	switch(ptype)
-	{
-		case 0:
-    			cv::Canny(frame, processed, 400, 1000, 5);
-			break;
-		case 1:
-			cv::GaussianBlur(frame, processed, cv::Size(psize,psize),3,3);
-			break;
-		case 2:
-			cv::blur(frame, processed, Size(psize,psize), Point(-1,0));
-			break;
-		case 3:
-			cv::medianBlur( frame, processed, psize);
-			break;
-		case 4: 
-			cv::cvtColor(frame, processed, CV_BGR2GRAY);
-			break;
-		case 5:
-			cv::cvtColor(frame, processed, CV_BGR2GRAY);
-			cv::threshold(processed, processed, (double)p4, maxVal, cv::THRESH_BINARY);
-			break;
-		case 6:
-			cv::flip(frame, processed, p2);
-			break;
-		case 7:
-			processed = channel_swap(frame);
-			break;
-		case 8:
-			processed = BGR2GRAY(frame);
-			infoimg = histinfo(processed);
-			break;
-		case 9:
-			processed = BGR2GRAY(frame);
-			processed = grayInvert(processed);
-			break;
-		case 10:
-			processed = frame;
-			infoimg = histinfo(processed);
-		default:
-			processed=frame;
-			break;
+
+cv::Mat mycut(cv::Mat img, cv::Point2i p, cv::Size sz) {
+	int img_width, img_height, out_width, out_height;
+	int channels = img.channels();
+	if ( p.x < 0 || p.y < 0 || p.x >= img.cols || p.y >= img.rows ) {
+		return cv::Mat(0,0,CV_8UC3);
 	}
-}
-
-int main(int, char**)
-{
-    cout << "Opening camera..." << endl;
-    VideoCapture capture(0); // open the first camera
-    if (!capture.isOpened())
-    {
-        cerr << "ERROR: Can't initialize camera capture" << endl;
-        return 1;
-    }
-    namedWindow(capture_name);
-    namedWindow(window_name);
-    namedWindow(info_name);
-
-    configimg = cv::Mat::zeros(100, 400, CV_8UC1);
-    infoimg = cv::Mat::zeros(300, 300, CV_8UC1);
-    cout << "Frame width: " << capture.get(CAP_PROP_FRAME_WIDTH) << endl;
-    cout << "     height: " << capture.get(CAP_PROP_FRAME_HEIGHT) << endl;
-    cout << "Capturing FPS: " << capture.get(CAP_PROP_FPS) << endl;
-
-    cout << endl << "Press 'ESC' to quit, 'space' to toggle frame processing" << endl;
-    cout << endl << "Start grabbing..." << endl;
-
-    size_t nFrames = 0;
-    bool enableProcessing = false;
-    int64 t0 = cv::getTickCount();
-    int64 processingTime = 0;
-
-    createTrackbar(ptype_name, window_name, &ptype, 20, on_ptype_trackbar);
-    createTrackbar(p1_name, window_name, &p1, 10, on_p1_trackbar);
-    createTrackbar(p2_name, window_name, &p2, 10, on_p2_trackbar);
-    createTrackbar(p3_name, window_name, &p3, 10, on_p3_trackbar);
-    createTrackbar(p4_name, window_name, &p4, 250, on_p4_trackbar);
-
-
-    for (;;)
-    {
-        capture >> frame; // read the next frame from camera
-        if (frame.empty())
-        {
-            cerr << "ERROR: Can't grab camera frame." << endl;
-            break;
-        }
-        nFrames++;
-        if (nFrames % 10 == 0)
-        {
-            const int N = 10;
-            int64 t1 = cv::getTickCount();
-            cout << "ptype:" << ptype
-		 << "-p1:" << p1 
-		 << "-p2:" << p2 
-		 << "-p3:" << p3 
-		 << "-p4:" << p4 
-		 << "TotalFrames:" << cv::format("%5lld", (long long int)nFrames)
-                 << "-Average FPS: " << cv::format("%9.1f", (double)getTickFrequency() * N / (t1 - t0))
-                 << "-Average time per frame: " << cv::format("%9.2f ms", (double)(t1 - t0) * 1000.0f / (N * getTickFrequency()))
-                 << "-Average processing time: " << cv::format("%9.2f ms", (double)(processingTime) * 1000.0f / (N * getTickFrequency()))
-                 << std::endl;
-            t0 = t1;
-            processingTime = 0;
-        }
-        if (!enableProcessing)
-        {
-            imshow(capture_name, frame);
-            imshow(window_name, configimg);
-    	    moveWindow(window_name, 0, 0 ); 
+	img_width = img.cols;
+	img_height = img.rows;
+	out_width = sz.width;
+	out_height = sz.height;
+	if ( img_width - p.x < out_width ) {
+		out_width = img_width - p.x;
 	}
-        else
-        {
-            int64 tp0 = cv::getTickCount();
-            //cv::Canny(frame, processed, 400, 1000, 5);
-	    do_process();
-            processingTime += cv::getTickCount() - tp0;
-            imshow(capture_name, processed);
-	    imshow(window_name, configimg);
-	    imshow(info_name, infoimg);
-        }
-        moveWindow(info_name, 1366 - infoimg.cols, 0);
-	moveWindow(window_name, 0, 0 ); 
-        int key = waitKey(1);
-        if (key == 27/*ESC*/)
-            break;
-        if (key == 32/*SPACE*/)
-        {
-            enableProcessing = !enableProcessing;
-            cout << "Enable frame processing ('space' key): " << enableProcessing << endl;
-        }
-    }
-    std::cout << "Number of captured frames: " << nFrames << endl;
-    return nFrames > 0 ? 0 : 1;
+	if ( img_height - p.y < out_height) {
+		out_height = img_height - p.y;
+	}
+	cv::Mat out = getMat(img, cv::Size(out_height, out_width));
+	for ( int x = 0; x < out_width; x++ ) {
+		for ( int y = 0; y < out_height; y++) {
+			if ( 1 == channels ) {
+				out.at<uchar>(y,x) = img.at<uchar>(y+p.y, x+p.x);	
+			} else if ( 3 == channels ) {
+				out.at<cv::Vec3b>(y,x)[0] = img.at<cv::Vec3b>(y+p.y, x+p.x)[0];
+				out.at<cv::Vec3b>(y,x)[1] = img.at<cv::Vec3b>(y+p.y, x+p.x)[1];
+				out.at<cv::Vec3b>(y,x)[2] = img.at<cv::Vec3b>(y+p.y, x+p.x)[2];
+			}
+		}	
+	}
+	return out;
 }
+
+cv::Mat myflood(cv::Mat img, cv::Scalar src, int floodrange, cv::Scalar dst) {
+	cv::Mat out = getMat(img, cv::Size(img.rows, img.cols));
+	int channels = img.channels();
+	if ( 1 == channels ) {
+		for ( int x = 0; x < out.cols; x++ ) {
+			for ( int y = 0; y < out.rows; y++ ) {
+				if ( img.at<uchar>(y,x) < src.val[0] - floodrange || img.at<uchar>(y,x) > src.val[0] + floodrange ) {
+					continue;
+				} else {
+					out.at<uchar>(y,x) = dst.val[0];
+				}				
+			}
+		}
+	} else if ( 3 == channels ) {
+		for ( int x = 0; x < out.cols; x++ ) {
+			for ( int y = 0; y < out.rows; y++ ) {
+				if (    img.at<cv::Vec3b>(y,x)[0] < src.val[0] - floodrange || \
+					img.at<cv::Vec3b>(y,x)[0] > src.val[0] + floodrange || \
+					img.at<cv::Vec3b>(y,x)[1] < src.val[1] - floodrange || \
+					img.at<cv::Vec3b>(y,x)[1] > src.val[1] + floodrange || \
+					img.at<cv::Vec3b>(y,x)[2] < src.val[2] - floodrange || \
+					img.at<cv::Vec3b>(y,x)[2] > src.val[2] + floodrange  ) {
+						continue;
+				} else {
+					out.at<cv::Vec3b>(y,x)[0] = dst.val[0];
+					out.at<cv::Vec3b>(y,x)[1] = dst.val[1];
+					out.at<cv::Vec3b>(y,x)[2] = dst.val[2];
+				}
+			}
+		}
+	}
+	return out;
+}
+
+
+// affine
+cv::Mat myaffine(cv::Mat img, double a, double b, double c, double d, double tx, double ty, double theta){
+  // get height and width
+  int width = img.cols;
+  int height = img.rows;
+  int channel = img.channels();
+
+  // get detriment
+  double det = a * d - b * c;
+
+  if (theta != 0){
+    // Affine parameters
+    double rad = theta / 180. * M_PI;
+    a = std::cos(rad);
+    b = - std::sin(rad);
+    c = std::sin(rad);
+    d = std::cos(rad);
+    tx = 0;
+    ty = 0;
+
+    double det = a * d - b * c;
+
+    // center transition
+    double cx = width / 2.;
+    double cy = height / 2.;
+    double new_cx = (d * cx - b * cy) / det;
+    double new_cy = (- c * cx + a * cy) / det;
+    tx = new_cx - cx;
+    ty = new_cy - cy;
+  }
+
+  // Resize width and height
+  int resized_width = (int)(width * a);
+  int resized_height = (int)(height * d);
+  
+  if (theta != 0) {
+    resized_width = (int)(width);
+    resized_height = (int)(height);
+  }
+
+  // other parameters
+  int x_before, y_before;
+  double dx, dy, wx, wy, w_sum;
+  double val;
+  int _x, _y;
+
+  // output
+  cv::Mat out = cv::Mat::zeros(resized_height, resized_width, CV_8UC3);
+
+  // Affine transformation
+  for (int y = 0; y < resized_height; y++){    
+    for (int x = 0; x < resized_width; x++){
+
+      // get original position x
+      x_before = (int)((d * x - b * y) / det - tx);
+
+      if ((x_before < 0) || (x_before >= width)){
+        continue;
+      }
+
+      // get original position y
+      y_before = (int)((-c * x + a * y) / det - ty);
+
+      if ((y_before < 0) || (y_before >= height)){
+        continue;
+      }
+
+      // assign pixel to new position
+      for (int c = 0; c < channel; c++){
+        out.at<cv::Vec3b>(y, x)[c] = img.at<cv::Vec3b>(y_before, x_before)[c];
+      }
+    }
+  }
+
+  return out;
+}
+
+// Channel swap
+cv::Mat channel_swap(cv::Mat img){
+  // get height and width
+  int width = img.cols;
+  int height = img.rows;
+
+  // prepare output
+  cv::Mat out = cv::Mat::zeros(height, width, CV_8UC3);
+
+  // each y, x
+  for (int y = 0; y < height; y++){
+    for (int x = 0; x < width; x++){
+      // R -> B
+      out.at<cv::Vec3b>(y, x)[0] = img.at<cv::Vec3b>(y, x)[2];
+      // B -> R
+      out.at<cv::Vec3b>(y, x)[2] = img.at<cv::Vec3b>(y, x)[0];
+      // G -> G
+      out.at<cv::Vec3b>(y, x)[1] = img.at<cv::Vec3b>(y, x)[1];
+    }
+  }
+
+  return out;
+}
+
+cv::Mat BGR2GRAY(cv::Mat img){
+  // get height and width
+  int width = img.cols;
+  int height = img.rows;
+
+  // prepare output
+  cv::Mat out = cv::Mat::zeros(height, width, CV_8UC1);
+
+  // each y, x
+  for (int y = 0; y < height; y++){
+    for (int x = 0; x < width; x++){
+      // BGR -> Gray
+      out.at<uchar>(y, x) = 0.2126 * (float)img.at<cv::Vec3b>(y, x)[2] \
+        + 0.7152 * (float)img.at<cv::Vec3b>(y, x)[1] \
+        + 0.0722 * (float)img.at<cv::Vec3b>(y, x)[0];
+    }
+  }
+
+  return out;
+}
+
+cv::Mat grayInvert(cv::Mat img){
+  // get height and width
+  int width = img.cols;
+  int height = img.rows;
+
+  // prepare output
+  cv::Mat out = cv::Mat::zeros(height, width, CV_8UC1);
+
+  // each y, x
+  for (int y = 0; y < height; y++){
+    for (int x = 0; x < width; x++){
+      // BGR -> Gray
+      out.at<uchar>(y, x) = 255 - img.at<uchar>(y, x) - 1;
+    }
+  }
+
+  return out;
+}
+
+cv::Mat hist_C1(cv::Mat img) {
+  // get height and width
+  int width = img.cols;
+  int height = img.rows;
+  int c[256];
+  int BLACK = 0, WHITE = 255;
+  int hight = 600;
+  // prepare output
+  cv::Mat out = cv::Mat::zeros(hight, 256, CV_8UC1);
+  for ( int i =0 ; i < 256; i++ ) {
+	c[i] = 0;
+  }
+  // each y, x
+  for (int y = 0; y < height; y++){
+    for (int x = 0; x < width; x++){
+      // BGR -> Gray
+      c[img.at<uchar>(y, x)] = c[img.at<uchar>(y, x)] + 1;
+    }
+  }
+  double total = height * width;
+  int counttotal = 0;
+  for ( int i =0 ; i < 256; i++ ) {
+      counttotal += c[i];
+  }
+  int count = 0;
+  int bgcolor = 0;
+  for ( int x = 0; x < 256; x++) {
+	count = round(hight * (1.0 - ((double)(c[x])/total)));	
+        /**
+	cout << " c[" << x << "] = " << c[x] << "; count = " << count 
+             << "; total = " << total 
+             << "; countotal = " << counttotal << endl;
+       **/
+	if ( x < 128) {
+		bgcolor = WHITE;
+	} else {
+		bgcolor = BLACK;
+	}
+    	for( int y = 0; y < hight; y++) {
+		if ( y <= count ) {
+			out.at<uchar>(y,x) = bgcolor;	
+		} else { 
+			out.at<uchar>(y,x) = x;	
+		}
+    	}
+  }
+  return out;
+}
+
+cv::Mat hist_C3(cv::Mat img) {
+  // get height and width
+  int width = img.cols;
+  int height = img.rows;
+  int c[3][256];
+  int BLACK = 0, WHITE = 255;
+  int hight = 600;
+  // prepare output
+  cv::Mat out = cv::Mat::zeros(hight, 256*3, CV_8UC3);
+  for ( int j = 0; j < 3; j++ ) {
+  	for ( int i =0 ; i < 256; i++ ) {
+		c[j][i] = 0;
+  	}
+  }
+  // each y, x
+  for ( int channel = 0 ; channel < 3; channel++ ) {
+  	for (int y = 0; y < height; y++){
+    		for (int x = 0; x < width; x++){
+      			c[channel][img.at<cv::Vec3b>(y, x)[channel]] = c[channel][img.at<cv::Vec3b>(y, x)[channel]] + 1;
+    		}
+  	}
+  }
+  // start to draw hist image
+  float total = height * width;
+  int count = 0;
+  int bgcolor = 0;
+  int position_x = 0;
+  for ( int channel = 0 ; channel < 3; channel++ ) {
+  	for ( int x = 0; x < 256; x++) {
+		count = (int) hight * (1.0 - ((float)(c[channel][x])/total));	
+        /**
+	cout << " c[" << x << "] = " << c[x] << "; count = " << count 
+             << "; total = " << total 
+       **/
+		if ( x < 128) {
+			bgcolor = WHITE;
+		} else {
+			bgcolor = BLACK;
+		}
+    		for( int y = 0; y < hight; y++) {
+			position_x = x  + 256 * channel;
+			if ( y <= count ) {
+				out.at<cv::Vec3b>(y,position_x)[0] = bgcolor;	
+				out.at<cv::Vec3b>(y,position_x)[1] = bgcolor;	
+				out.at<cv::Vec3b>(y,position_x)[2] = bgcolor;	
+			} else { 
+				out.at<cv::Vec3b>(y,position_x)[channel] = x;	
+			}
+    		}
+  	}
+  }
+  return out;
+}
+
+cv::Mat histinfo(cv::Mat img){
+  // get height and width
+  int channels = img.channels();
+  // prepare output
+  
+  cv::Mat out = cv::Mat::zeros(10, 10, CV_8UC1);
+  if (  1 == channels ) {
+	out = hist_C1(img);
+   } else if ( 3 == channels ) {
+	out = hist_C3(img); 
+   } else {
+	out = cv::Mat::zeros(100, 100, CV_8UC1);
+   }
+   return out;
+}
+
+
