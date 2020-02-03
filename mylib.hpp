@@ -1,5 +1,7 @@
+std::string getString(const int n);
+void viewMat(cv::Mat img, int col, int row);
 cv::Mat myaffine(cv::Mat img, double a, double b, double c, double d, double tx, double ty, double theta);
- cv::Mat BGR2GRAY(cv::Mat img);
+cv::Mat BGR2GRAY(cv::Mat img);
 cv::Mat grayInvert(cv::Mat img);
 cv::Mat channel_swap(cv::Mat img);
 cv::Mat histinfo(cv::Mat img);

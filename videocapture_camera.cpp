@@ -18,12 +18,13 @@ const String p3_name = "P3";
 const String p4_name = "P4";
 int ptype = 0;
 int p1 = 0;
-int p2 = -1;
+int p2 = 0;
 int p3 = 0;
 int p4 = 0;
 int psize=0;
 double thresh = 100;
 int maxVal = 255;
+int count = 0;
 Mat frame,  processed, infoimg, configimg, background;
 
 static void on_ptype_trackbar(int, void *)
@@ -93,6 +94,10 @@ static void do_process()
 			break;
 		case 12:
 			processed = alphaBlend(frame, background, (double)p1/10); 
+			break;
+		case 13:
+			processed = frame;
+			viewMat(processed, p1, p2);
 			break;
 		default:
 			processed=frame;
@@ -187,6 +192,10 @@ int main(int, char**)
             enableProcessing = !enableProcessing;
             cout << "Enable frame processing ('space' key): " << enableProcessing << endl;
         }
+	if ( key == 83 || key == 115 ) {
+		imwrite("img_"+getString(count)+".jpg",processed);	
+		count++;
+	} 
     }
     std::cout << "Number of captured frames: " << nFrames << endl;
     return nFrames > 0 ? 0 : 1;

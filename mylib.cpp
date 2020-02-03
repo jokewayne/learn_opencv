@@ -2,8 +2,15 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <cmath>
+#include <sstream>
 
 using std::cout; using std::cerr; using std::endl;
+
+std::string getString(const int n) {
+	std::stringstream newstr;
+	newstr<<n;
+	return newstr.str();
+}
 
 cv::Mat getMat(cv::Mat img, cv::Size sz) { 
 	int channels;
@@ -13,6 +20,21 @@ cv::Mat getMat(cv::Mat img, cv::Size sz) {
 		return cv::Mat::zeros(sz.height, sz.width, CV_8UC3);
 	} 
 	return cv::Mat::zeros(sz.height, sz.width, CV_8UC3);
+}
+
+void viewMat(cv::Mat img, int col, int row) {
+
+	if ( col >= img.cols || row >= img.rows || col < 0 || row < 0) {
+		cout << "col:" << col
+		     << ", row:" << row
+                     << "; img.cols:" << img.cols
+   		     << ", img.rows:" << img.rows << endl;
+	} else {
+		cout << "BGR:(" << row << ", " << col << ")=[" 
+		     << getString(img.at<cv::Vec3b>(row, col)[0]) << ","
+		     << getString(img.at<cv::Vec3b>(row, col)[1]) << ","
+		     << getString(img.at<cv::Vec3b>(row, col)[2]) << "]" << endl;
+	} 
 }
 
 cv::Mat alphaBlend(cv::Mat img1, cv::Mat img2, double alpha) {
