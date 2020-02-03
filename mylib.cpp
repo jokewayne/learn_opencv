@@ -14,6 +14,29 @@ cv::Mat getMat(cv::Mat img, cv::Size sz) {
 	} 
 	return cv::Mat::zeros(sz.height, sz.width, CV_8UC3);
 }
+
+cv::Mat alphaBlend(cv::Mat img1, cv::Mat img2, double alpha) {
+	cv::Mat out = cv::Mat::zeros(img1.rows, img1.cols, CV_8UC3);
+	if ( alpha > 1 ) {
+		return img1;
+	}
+	double beta = 1 - alpha;
+	for ( int y=0; y < img1.rows; y++ ) {
+		for ( int x=0; x < img1.cols; x++ ) {
+			if ( x >= img2.cols || y >= img2.rows ) {
+				out.at<cv::Vec3b>(y,x)[0] = img1.at<cv::Vec3b>(y,x)[0];
+				out.at<cv::Vec3b>(y,x)[1] = img1.at<cv::Vec3b>(y,x)[1];
+				out.at<cv::Vec3b>(y,x)[2] = img1.at<cv::Vec3b>(y,x)[2];
+			} else {
+				out.at<cv::Vec3b>(y,x)[0] = (int) ( alpha * (double)img1.at<cv::Vec3b>(y,x)[0] + beta * (double)img2.at<cv::Vec3b>(y,x)[0]);
+				out.at<cv::Vec3b>(y,x)[1] = (int) ( alpha * (double)img1.at<cv::Vec3b>(y,x)[1] + beta * (double)img2.at<cv::Vec3b>(y,x)[1]);
+				out.at<cv::Vec3b>(y,x)[2] = (int) ( alpha * (double)img1.at<cv::Vec3b>(y,x)[2] + beta * (double)img2.at<cv::Vec3b>(y,x)[2]);
+			}
+		}
+	}
+	return out;
+}
+
 cv::Mat myrotate(cv::Mat img, double degree, double resized) {
 	cv::Mat rotmat = getRotationMatrix2D(cv::Point(img.cols/2, img.rows/2), degree, resized);
 	double rad = degree/180. * M_PI;

@@ -24,7 +24,7 @@ int p4 = 0;
 int psize=0;
 double thresh = 100;
 int maxVal = 255;
-Mat frame,  processed, infoimg, configimg;
+Mat frame,  processed, infoimg, configimg, background;
 
 static void on_ptype_trackbar(int, void *)
 {
@@ -91,6 +91,9 @@ static void do_process()
 		case 11:
 			processed = myrotate(frame, p1*36.0, 1);
 			break;
+		case 12:
+			processed = alphaBlend(frame, background, (double)p1/10); 
+			break;
 		default:
 			processed=frame;
 			break;
@@ -112,6 +115,7 @@ int main(int, char**)
 
     configimg = cv::Mat::zeros(100, 400, CV_8UC1);
     infoimg = cv::Mat::zeros(300, 300, CV_8UC1);
+    background = imread("ng2.jpg");
     cout << "Frame width: " << capture.get(CAP_PROP_FRAME_WIDTH) << endl;
     cout << "     height: " << capture.get(CAP_PROP_FRAME_HEIGHT) << endl;
     cout << "Capturing FPS: " << capture.get(CAP_PROP_FPS) << endl;
