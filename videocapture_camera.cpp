@@ -3,6 +3,7 @@
 #include <opencv2/highgui.hpp>
 #include <opencv2/imgproc.hpp>  // cv::Canny()
 #include <iostream>
+#include <math.h>
 #include "mylib.hpp"
 
 using namespace cv;
@@ -25,7 +26,8 @@ int psize=0;
 double thresh = 100;
 int maxVal = 255;
 int count = 0;
-Mat frame,  processed, infoimg, configimg, background;
+int powercount = 1;
+Mat frame,  processed, infoimg, configimg, background, cpimg;
 
 static void on_ptype_trackbar(int, void *)
 {
@@ -99,6 +101,17 @@ static void do_process()
 			processed = frame;
 			viewMat(processed, p1, p2);
 			break;
+		case 14:
+			cpimg = alphaBlend(frame, cpimg, (double)1/count);
+			processed = cpimg;
+			if ( count % 3 == 0) {
+				cout << "save picture: " << getString(count) << endl;
+				imwrite("cpimg13_" + getString(count) + ".jpg", cpimg);
+				if ( powercount < 4 )  powercount++;
+			}
+			count++;
+			cout << "count: " << getString(count) << endl;
+			break;
 		default:
 			processed=frame;
 			break;
@@ -120,6 +133,7 @@ int main(int, char**)
 
     configimg = cv::Mat::zeros(100, 400, CV_8UC1);
     infoimg = cv::Mat::zeros(300, 300, CV_8UC1);
+    cpimg = cv::Mat::zeros(480, 640, CV_8UC3);
     background = imread("ng2.jpg");
     cout << "Frame width: " << capture.get(CAP_PROP_FRAME_WIDTH) << endl;
     cout << "     height: " << capture.get(CAP_PROP_FRAME_HEIGHT) << endl;
