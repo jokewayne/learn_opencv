@@ -37,6 +37,52 @@ void viewMat(cv::Mat img, int col, int row) {
 	} 
 }
 
+cv::Mat hsvtoColor(cv::Mat img) {
+	cv::Mat out = getMat(img, img.size());	
+	int h = 0, hc =0;
+	for (int y=0; y < out.rows; y++ ) {
+		for ( int x = 0; x < out.cols; x++ ) {
+			h = img.at<cv::Vec3b>(y,x)[0]; 
+			if ( h > 15 ) { 
+				hc = (h-15)/30;
+			} else {
+				hc = 5; 
+			}
+			//hc 0=GR 1=G 2=BG 3=B 4=BR 5=R
+			// [0]=B [1]=G [2]=R
+			switch (hc) {
+				case 0:
+					out.at<cv::Vec3b>(y,x)[1] = 255;
+					out.at<cv::Vec3b>(y,x)[2] = 255;
+					break;
+				case 1:
+					out.at<cv::Vec3b>(y,x)[1] = 255;
+					break;
+				case 2:
+					out.at<cv::Vec3b>(y,x)[1] = 255;
+					out.at<cv::Vec3b>(y,x)[0] = 255;
+					break;
+				case 3:
+					out.at<cv::Vec3b>(y,x)[0] = 255;
+					break;
+				case 4:
+					out.at<cv::Vec3b>(y,x)[0] = 255;
+					out.at<cv::Vec3b>(y,x)[2] = 255;
+					break;
+				case 5:
+					out.at<cv::Vec3b>(y,x)[2] = 255;
+					break;
+				default:
+					out.at<cv::Vec3b>(y,x)[0] = 0;
+					out.at<cv::Vec3b>(y,x)[1] = 0;
+					out.at<cv::Vec3b>(y,x)[2] = 0;
+					break;
+			}	
+		}
+	}
+	return out;
+}
+
 cv::Mat alphaBlend(cv::Mat img1, cv::Mat img2, double alpha) {
 	cv::Mat out = cv::Mat::zeros(img1.rows, img1.cols, CV_8UC3);
 	if ( alpha > 1 ) {

@@ -9,4 +9,5 @@ cv::Mat mycut(cv::Mat img, cv::Point2i p, cv::Size sz);
 cv::Mat myflood(cv::Mat img, cv::Scalar src, int floodrange, cv::Scalar dst);
 cv::Mat myrotate(cv::Mat img, double degree, double resized) ;
 cv::Mat alphaBlend(cv::Mat img1, cv::Mat img2, double alpha) ;
+cv::Mat hsvtoColor(cv::Mat img) ;
 

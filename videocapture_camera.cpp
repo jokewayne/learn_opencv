@@ -27,7 +27,7 @@ double thresh = 100;
 int maxVal = 255;
 int count = 0;
 int powercount = 1;
-Mat frame,  processed, infoimg, configimg, background, cpimg;
+Mat frame,  processed, infoimg, configimg, background, cpimg, smoothimg;
 
 static void on_ptype_trackbar(int, void *)
 {
@@ -112,6 +112,21 @@ static void do_process()
 			count++;
 			cout << "count: " << getString(count) << endl;
 			break;
+		case 15:
+			cvtColor(frame, processed, cv::COLOR_BGR2HSV, 3);
+			processed = hsvtoColor(processed);
+			break;	
+		case 16:
+			smoothimg = alphaBlend(frame, smoothimg, (double)1/10);
+			count++;
+			if ( count >= 10 ) {
+				//cvtColor(smoothimg, processed, cv::COLOR_BGR2HSV, 3);
+				//processed = hsvtoColor(processed);
+				processed = smoothimg;
+				smoothimg = frame;
+				count = 0;
+			}
+			break;		
 		default:
 			processed=frame;
 			break;
@@ -134,6 +149,8 @@ int main(int, char**)
     configimg = cv::Mat::zeros(100, 400, CV_8UC1);
     infoimg = cv::Mat::zeros(300, 300, CV_8UC1);
     cpimg = cv::Mat::zeros(480, 640, CV_8UC3);
+    smoothimg = cv::Mat::zeros(480, 640, CV_8UC3);
+    processed = cv::Mat::zeros(480, 640, CV_8UC3);
     background = imread("ng2.jpg");
     cout << "Frame width: " << capture.get(CAP_PROP_FRAME_WIDTH) << endl;
     cout << "     height: " << capture.get(CAP_PROP_FRAME_HEIGHT) << endl;
