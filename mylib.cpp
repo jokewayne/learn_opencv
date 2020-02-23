@@ -38,11 +38,18 @@ void viewMat(cv::Mat img, int col, int row) {
 }
 
 cv::Mat hsvtoColor(cv::Mat img) {
-	cv::Mat out = getMat(img, img.size());	
-	int h = 0, hc =0;
+	cv::Mat hsvimg; 
+	cv::Mat out = cv::Mat(img);	
+	cv::cvtColor(img, hsvimg, cv::COLOR_BGR2HSV,3);
+	int h = 0, s = 0, v = 0, hc =0;
 	for (int y=0; y < out.rows; y++ ) {
 		for ( int x = 0; x < out.cols; x++ ) {
-			h = img.at<cv::Vec3b>(y,x)[0]; 
+			h = hsvimg.at<cv::Vec3b>(y,x)[0]; 
+			s = hsvimg.at<cv::Vec3b>(y,x)[1];
+			v = hsvimg.at<cv::Vec3b>(y,x)[2];
+			if ( s < 43 || v < 46 ) {
+				continue;
+			}
 			if ( h > 15 ) { 
 				hc = (h-15)/30;
 			} else {
@@ -54,23 +61,32 @@ cv::Mat hsvtoColor(cv::Mat img) {
 				case 0:
 					out.at<cv::Vec3b>(y,x)[1] = 255;
 					out.at<cv::Vec3b>(y,x)[2] = 255;
+					out.at<cv::Vec3b>(y,x)[0] = 0;
 					break;
 				case 1:
 					out.at<cv::Vec3b>(y,x)[1] = 255;
+					out.at<cv::Vec3b>(y,x)[2] = 0;
+					out.at<cv::Vec3b>(y,x)[0] = 0;
 					break;
 				case 2:
 					out.at<cv::Vec3b>(y,x)[1] = 255;
 					out.at<cv::Vec3b>(y,x)[0] = 255;
+					out.at<cv::Vec3b>(y,x)[2] = 0;
 					break;
 				case 3:
 					out.at<cv::Vec3b>(y,x)[0] = 255;
+					out.at<cv::Vec3b>(y,x)[1] = 0;
+					out.at<cv::Vec3b>(y,x)[2] = 0;
 					break;
 				case 4:
 					out.at<cv::Vec3b>(y,x)[0] = 255;
 					out.at<cv::Vec3b>(y,x)[2] = 255;
+					out.at<cv::Vec3b>(y,x)[1] = 0;
 					break;
 				case 5:
 					out.at<cv::Vec3b>(y,x)[2] = 255;
+					out.at<cv::Vec3b>(y,x)[0] = 0;
+					out.at<cv::Vec3b>(y,x)[1] = 0;
 					break;
 				default:
 					out.at<cv::Vec3b>(y,x)[0] = 0;

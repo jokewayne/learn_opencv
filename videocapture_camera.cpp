@@ -113,8 +113,7 @@ static void do_process()
 			cout << "count: " << getString(count) << endl;
 			break;
 		case 15:
-			cvtColor(frame, processed, cv::COLOR_BGR2HSV, 3);
-			processed = hsvtoColor(processed);
+			processed = hsvtoColor(frame);
 			break;	
 		case 16:
 			smoothimg = alphaBlend(frame, smoothimg, (double)1/10);
