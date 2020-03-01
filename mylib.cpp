@@ -37,6 +37,100 @@ void viewMat(cv::Mat img, int col, int row) {
 	} 
 }
 
+cv::Mat mysubtract(cv::Mat src1, cv::Mat src2) {
+	cv::Mat out = cv::Mat::zeros(480,640, CV_8UC1);
+	//cv::absdiff(src1, src2, out);
+	for ( int y=0; y < out.rows; y++) {
+		for( int x=0; x < out.cols; x++ ) {
+			out.at<uchar>(y,x) = abs(src1.at<cv::Vec3b>(y,x)[0] - src2.at<cv::Vec3b>(y,x)[0]);
+			//cout << "[" << x << "," << y << "]:" << (int)out.at<uchar>(y,x) << endl; 
+			if ( out.at<uchar>(y,x) > 100 ) {
+				out.at<uchar>(y,x)=255;
+			}
+
+		}
+	}
+	return out;
+}
+
+cv::Mat colorMouse(cv::Mat img, int colortype, int sv) {
+	cv::Mat hsvimg; 
+	cv::Mat out = cv::Mat(img);	
+	cv::cvtColor(img, hsvimg, cv::COLOR_BGR2HSV,3);
+	int h = 0, s = 0, v = 0, hc =0;
+	int pointx = 0, pointy =0;
+	int count = 0;
+	for (int y=0; y < out.rows; y++ ) {
+		for ( int x = 0; x < out.cols; x++ ) {
+			h = hsvimg.at<cv::Vec3b>(y,x)[0]; 
+			s = hsvimg.at<cv::Vec3b>(y,x)[1];
+			v = hsvimg.at<cv::Vec3b>(y,x)[2];
+			if ( s < sv || v < sv ) {
+				continue;
+			}
+			if ( h > 15 ) { 
+				hc = (h-15)/30;
+			} else {
+				hc = 5; 
+			}
+			//hc 0=GR 1=G 2=BG 3=B 4=BR 5=R
+			// [0]=B [1]=G [2]=R
+			if ( colortype == hc ) {
+				count++;
+				pointx += x;
+				pointy += y;
+			}
+			switch (hc) {
+				// yellow 
+				case 0:
+					out.at<cv::Vec3b>(y,x)[1] = 255;
+					out.at<cv::Vec3b>(y,x)[2] = 255;
+					out.at<cv::Vec3b>(y,x)[0] = 0;
+					break;
+				// green
+				case 1:
+					out.at<cv::Vec3b>(y,x)[1] = 255;
+					out.at<cv::Vec3b>(y,x)[2] = 0;
+					out.at<cv::Vec3b>(y,x)[0] = 0;
+					break;
+				// sky blue 
+				case 2:
+					out.at<cv::Vec3b>(y,x)[1] = 255;
+					out.at<cv::Vec3b>(y,x)[0] = 255;
+					out.at<cv::Vec3b>(y,x)[2] = 0;
+					break;
+				// blue
+				case 3:
+					out.at<cv::Vec3b>(y,x)[0] = 255;
+					out.at<cv::Vec3b>(y,x)[1] = 0;
+					out.at<cv::Vec3b>(y,x)[2] = 0;
+					break;
+				// purple
+				case 4:
+					out.at<cv::Vec3b>(y,x)[0] = 255;
+					out.at<cv::Vec3b>(y,x)[2] = 255;
+					out.at<cv::Vec3b>(y,x)[1] = 0;
+					break;
+				// red
+				case 5:
+					out.at<cv::Vec3b>(y,x)[2] = 255;
+					out.at<cv::Vec3b>(y,x)[0] = 0;
+					out.at<cv::Vec3b>(y,x)[1] = 0;
+					break;
+				default:
+					out.at<cv::Vec3b>(y,x)[0] = 0;
+					out.at<cv::Vec3b>(y,x)[1] = 0;
+					out.at<cv::Vec3b>(y,x)[2] = 0;
+					break;
+			}	
+		}
+	}
+	cv::Point center(pointx/count, pointy/count);
+	circle(out, center, 10, cv::Scalar(255,255,255), 3, 8, 0);
+	return out;
+}
+
+
 cv::Mat hsvtoColor(cv::Mat img) {
 	cv::Mat hsvimg; 
 	cv::Mat out = cv::Mat(img);	

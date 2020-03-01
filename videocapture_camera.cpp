@@ -27,7 +27,7 @@ double thresh = 100;
 int maxVal = 255;
 int count = 0;
 int powercount = 1;
-Mat frame,  processed, infoimg, configimg, background, cpimg, smoothimg;
+Mat frame, lastframe, processed, infoimg, configimg, background, cpimg, smoothimg;
 
 static void on_ptype_trackbar(int, void *)
 {
@@ -126,6 +126,18 @@ static void do_process()
 				count = 0;
 			}
 			break;		
+		case 17:
+			smoothimg = mysubtract(frame, lastframe);
+			count++;
+			if ( count >= 10 ) {
+				processed = smoothimg;
+				lastframe = frame;
+				count = 0;
+			}
+			break;
+		case 18:
+			processed = colorMouse(frame, 0 , 40 + p1*5);
+			break;
 		default:
 			processed=frame;
 			break;
@@ -150,6 +162,7 @@ int main(int, char**)
     cpimg = cv::Mat::zeros(480, 640, CV_8UC3);
     smoothimg = cv::Mat::zeros(480, 640, CV_8UC3);
     processed = cv::Mat::zeros(480, 640, CV_8UC3);
+    lastframe = cv::Mat::zeros(480, 640, CV_8UC3);
     background = imread("ng2.jpg");
     cout << "Frame width: " << capture.get(CAP_PROP_FRAME_WIDTH) << endl;
     cout << "     height: " << capture.get(CAP_PROP_FRAME_HEIGHT) << endl;

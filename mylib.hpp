@@ -10,4 +10,6 @@ cv::Mat myflood(cv::Mat img, cv::Scalar src, int floodrange, cv::Scalar dst);
 cv::Mat myrotate(cv::Mat img, double degree, double resized) ;
 cv::Mat alphaBlend(cv::Mat img1, cv::Mat img2, double alpha) ;
 cv::Mat hsvtoColor(cv::Mat img) ;
+cv::Mat mysubtract(cv::Mat src1, cv::Mat src2) ;
+cv::Mat colorMouse(cv::Mat img, int colortype, int sv) ;
 
