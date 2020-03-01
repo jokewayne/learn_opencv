@@ -44,9 +44,11 @@ cv::Mat mysubtract(cv::Mat src1, cv::Mat src2) {
 		for( int x=0; x < out.cols; x++ ) {
 			out.at<uchar>(y,x) = abs(src1.at<cv::Vec3b>(y,x)[0] - src2.at<cv::Vec3b>(y,x)[0]);
 			//cout << "[" << x << "," << y << "]:" << (int)out.at<uchar>(y,x) << endl; 
-			if ( out.at<uchar>(y,x) > 100 ) {
+			if ( out.at<uchar>(y,x) > 50 ) {
 				out.at<uchar>(y,x)=255;
-			}
+			}  else {
+				out.at<uchar>(y,x)=0;
+			} 
 
 		}
 	}

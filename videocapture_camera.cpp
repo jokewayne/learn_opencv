@@ -127,13 +127,8 @@ static void do_process()
 			}
 			break;		
 		case 17:
-			smoothimg = mysubtract(frame, lastframe);
-			count++;
-			if ( count >= 10 ) {
-				processed = smoothimg;
-				lastframe = frame;
-				count = 0;
-			}
+			processed = mysubtract(frame, lastframe);
+			frame.copyTo(lastframe);
 			break;
 		case 18:
 			processed = colorMouse(frame, 0 , 40 + p1*5);
