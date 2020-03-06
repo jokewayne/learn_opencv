@@ -133,6 +133,9 @@ static void do_process()
 		case 18:
 			processed = colorMouse(frame, 0 , 40 + p1*5);
 			break;
+		case 19:
+			processed = findblob(frame);
+			break;
 		default:
 			processed=frame;
 			break;

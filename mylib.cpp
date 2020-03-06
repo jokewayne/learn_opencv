@@ -3,8 +3,10 @@
 #include <iostream>
 #include <cmath>
 #include <sstream>
+#include <vector>
 
 using std::cout; using std::cerr; using std::endl;
+using std::vector;
 
 std::string getString(const int n) {
 	std::stringstream newstr;
@@ -36,6 +38,45 @@ void viewMat(cv::Mat img, int col, int row) {
 		     << getString(img.at<cv::Vec3b>(row, col)[2]) << "]" << endl;
 	} 
 }
+
+cv::Mat findblob(cv::Mat src) {
+
+	// Setup SimpleBlobDetector parameters.
+	cv::SimpleBlobDetector::Params params;
+
+	// Change thresholds
+	params.minThreshold = 0;
+	params.maxThreshold = 200;
+
+	// Filter by Area.
+	params.filterByArea = true;
+	params.minArea = 50;
+
+	// Filter by Circularity
+	params.filterByCircularity = true;
+	params.minCircularity = 0.1;
+
+	// Filter by Convexity
+	params.filterByConvexity = true;
+	params.minConvexity = 0.2;
+
+	// Filter by Inertia
+	params.filterByInertia = true;
+	params.minInertiaRatio = 0.1;
+
+	// Storage for blobs
+	vector<cv::KeyPoint> keypoints;
+
+	// Set up detector with params
+	cv::Ptr<cv::SimpleBlobDetector> detector = cv::SimpleBlobDetector::create(params);   
+
+	// Detect blobs
+	detector->detect( src, keypoints);
+	cv::Mat im_with_keypoints;
+	drawKeypoints( src, keypoints, im_with_keypoints, cv::Scalar(0,0,255), cv::DrawMatchesFlags::DRAW_RICH_KEYPOINTS );	
+	return im_with_keypoints;	
+}
+
 
 cv::Mat mysubtract(cv::Mat src1, cv::Mat src2) {
 	cv::Mat out = cv::Mat::zeros(480,640, CV_8UC1);

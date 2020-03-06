@@ -1,5 +1,5 @@
 
-LIBS = -lopencv_imgcodecs -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_videoio
+LIBS = -lopencv_imgcodecs -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_videoio -lopencv_features2d
 
 .PHONY:all clean
 

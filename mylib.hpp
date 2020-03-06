@@ -12,4 +12,5 @@ cv::Mat alphaBlend(cv::Mat img1, cv::Mat img2, double alpha) ;
 cv::Mat hsvtoColor(cv::Mat img) ;
 cv::Mat mysubtract(cv::Mat src1, cv::Mat src2) ;
 cv::Mat colorMouse(cv::Mat img, int colortype, int sv) ;
+cv::Mat findblob(cv::Mat src) ;
 
