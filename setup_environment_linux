@@ -28,3 +28,22 @@ sudo make install
 *.so files are in /usr/local/lib/
 compile command will be:
 g++ sample.cpp -o sample -lopencv_imgcodecs -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_videoio
+
+---------------------------------------------------
+other ways to configure and make
+using cmake-gui
+install cmake-gui
+sudo apt install cmake-qt-gui
+
+In cmake-gui
+1. choose source location   /opencvbasedir
+2. choose build dir    /build-opencv
+3. search   check "Advanced"
+4. click "configure"
+5. "Unix Makefiles", choose "Specify options for cross-compiling"
+6. Operating System: Linux 
+   Compiler: choose cross-compiler
+   Target Root: /usr/local/vitasdk/arm-vita-eabi
+   Program Mode/Library Mode/Include Mode: Search only in Target Root
+7. "Finish"
+8. set "CMAKE_MAKE_PROGRAM" to /usr/bin/make
