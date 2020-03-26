@@ -47,3 +47,7 @@ In cmake-gui
    Program Mode/Library Mode/Include Mode: Search only in Target Root
 7. "Finish"
 8. set "CMAKE_MAKE_PROGRAM" to /usr/bin/make
+9. click "Configure" several times. uncheck unnecessary build options.
+10. click "generate"
+11. to build-opencv directory, run make.
+12. output will be in lib/
