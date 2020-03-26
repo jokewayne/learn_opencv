@@ -30,7 +30,7 @@ compile command will be:
 g++ sample.cpp -o sample -lopencv_imgcodecs -lopencv_core -lopencv_highgui -lopencv_imgproc -lopencv_videoio
 
 ---------------------------------------------------
-other ways to configure and make
+other ways to configure and make.   test on opencv 4.2.0 pass.
 using cmake-gui
 install cmake-gui
 sudo apt install cmake-qt-gui
