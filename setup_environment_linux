@@ -54,9 +54,22 @@ In cmake-gui
 
 FAQ：
 problem 1:  
-running link : no such file
+Error running link command: No such file or directory
 solution:
 find . -name "link.txt"
 first line change "CMAKE_AR-NOT-FOUND" to "your ar program"
 
-change
+problem 2:
+softfloat.cpp softdouble(int) ambigues
+solution:
+force convert all int to (uint64_t)
+
+problem 3:
+system.cpp mkstemp() undefine, close() undefine
+solution(temporary):
+#include <unistd.h>
+#include <fcntl.h>
+change 
+const int fd = mkstemp((char*)fname.c_str());
+to 
+const int fd = open((char*)fname.c_str(), O_WRONLY|O_CREAT);
