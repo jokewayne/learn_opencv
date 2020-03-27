@@ -51,3 +51,12 @@ In cmake-gui
 10. click "generate"
 11. to build-opencv directory, run make.
 12. output will be in lib/
+
+FAQ：
+problem 1:  
+running link : no such file
+solution:
+find . -name "link.txt"
+first line change "CMAKE_AR-NOT-FOUND" to "your ar program"
+
+change
