@@ -1,0 +1,8 @@
+
+#  opencv offical guide
+#  https://docs.opencv.org/master/d0/d76/tutorial_arm_crosscompile_with_cmake.html
+
+#  cmake offfical guide 
+#  https://gitlab.kitware.com/cmake/community/-/wikis/doc/cmake/CrossCompiling
+
+cmake -DCMAKE_TOOLCHAIN_FILE=${opencv/platform/linux/toolchainfile.} ${opencv_src_dir}
